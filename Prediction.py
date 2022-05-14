@@ -13,7 +13,7 @@ from keras.layers import Conv2D,Flatten,MaxPooling2D
 import librosa
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
-
+from time import sleep
 import librosa.display
 #from audiomentations import Compose,PitchShift,HighPassFilter,Trim
 
@@ -37,6 +37,9 @@ def Record():
 
     fs = 16000
     seconds = 2
+    for i in range(3,0,-1):
+        print(i)
+        sleep(0.7)
     print("start record")
     myrecord = sd.rec(int(seconds * fs), samplerate=fs,channels=2)
     #print(myrecord)
