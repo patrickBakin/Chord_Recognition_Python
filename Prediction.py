@@ -53,7 +53,7 @@ def Record():
 def PrepareData(audiofile=None,sr=16000):
     
     new_frequency=Resampling(wave=audiofile,sr=sr)
-    ProcessData(np.array(new_frequency))
+    return new_frequency
 
 def Resampling(wave=None,sr=0,audiodata=None):
 
@@ -92,16 +92,15 @@ def ProcessData(freqArray):
         output = np.append(output, b)
     array_output = np_utils.to_categorical(output)
 
-    create_network(New_freqArray,array_output)
+    return New_freqArray
 
 
 
 
 
-def create_network(n_inputs, n_outputs):
-
+def create_network():
         model = Sequential()
-        model.add(Conv2D(128, (3, 3), activation='relu', input_shape=n_inputs.shape[1:]))
+        model.add(Conv2D(128, (3, 3), activation='relu', input_shape=(513,57,1)))
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Conv2D(128, (3, 3), activation='relu'))
         model.add(MaxPooling2D(pool_size=(2, 2)))
@@ -114,8 +113,9 @@ def create_network(n_inputs, n_outputs):
         model.compile(loss='categorical_crossentropy', optimizer=adm, metrics=['accuracy'])
 
         model.load_weights('weights-Chord-030-0.0052-0.9990.hdf5')
-        
-        DoPredict(model,n_inputs)
+
+        return model
+
 
 def DoPredict(model,prediction_input):
 
@@ -138,7 +138,13 @@ def get_nth_key(dictionary, n=0):
             return key
     raise IndexError("dictionary index out of range")
 
-if __name__ == '__main__':
+
     
-    Record()
-    PrepareData(audiofile="test_recording.wav")
+model = create_network()
+while True:
+        Record()
+        new_frequency=PrepareData(audiofile="test_recording.wav")
+        New_freqArray=ProcessData(np.array(new_frequency))
+        DoPredict(model, New_freqArray)
+        if str(input("Predict again? 0 == exit: ")) == "0":
+            break
